@@ -50,6 +50,7 @@ END_MESSAGE_MAP()
 
 CHookIEDlg::CHookIEDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CHookIEDlg::IDD, pParent)
+	, m_uiDomain(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -57,12 +58,17 @@ CHookIEDlg::CHookIEDlg(CWnd* pParent /*=NULL*/)
 void CHookIEDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_EDIT_DOMAIN, m_uiDomain);
+	DDX_Control(pDX, IDC_BTN_HOOKIE, m_uiHookIEBtn);
+	DDX_Control(pDX, IDC_BTN_UNHOOKIE, m_uiUnHookIEBtn);
 }
 
 BEGIN_MESSAGE_MAP(CHookIEDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BTN_HOOKIE, &CHookIEDlg::OnBnClickedBtnHookie)
+	ON_BN_CLICKED(IDC_BTN_UNHOOKIE, &CHookIEDlg::OnBnClickedBtnUnhookie)
 END_MESSAGE_MAP()
 
 
@@ -98,6 +104,11 @@ BOOL CHookIEDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
+	m_uiDomain = _T("baidu.com");
+	UpdateData(FALSE);
+
+
+
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -151,3 +162,24 @@ HCURSOR CHookIEDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CHookIEDlg::OnBnClickedBtnHookie()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	UpdateData(TRUE);
+	CString iePath = CInjectDllUtility::GetIEPath();
+	//CString iePath = _T("C:\\Program Files\\internet explorer\\iexplore.exe");
+	CString dllPath = CInjectDllUtility::GetModulePath() + _T("IATHookDll.dll");
+	CInjectDllUtility::InjectDllToExe(dllPath,iePath);
+}
+
+
+void CHookIEDlg::OnBnClickedBtnUnhookie()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString iePath = CInjectDllUtility::GetIEPath();
+	//CString iePath = _T("C:\\Program Files\\internet explorer\\iexplore.exe");
+	CString dllPath = CInjectDllUtility::GetModulePath() + _T("IATHookDll.dll");
+	CInjectDllUtility::InjectDllToExe(dllPath,iePath);
+}

@@ -1,9 +1,8 @@
-// dllmain.cpp : 定义 DLL 应用程序的入口点。
 #include "stdafx.h"
-#include <windows.h>
+#include <Windows.h>
 #include <Wininet.h>
 
-//定义函数指针，和CreateFileW一致
+//定义函数指针，和InternetOpenUrlW一致
 typedef HINTERNET (* WINAPI InternetOpenUrlFunc)(
 	_In_ HINTERNET hInternet,
 	_In_ LPCTSTR   lpszUrl,
@@ -28,7 +27,6 @@ DWORD* pInternetOpenUrlAddrOrgin = 0;
 
 
 
-//fake func replace the one above
 HANDLE WINAPI myInternetOpenUrl(
 		_In_ HINTERNET hInternet,
 		_In_ LPCTSTR   lpszUrl,
@@ -40,6 +38,7 @@ HANDLE WINAPI myInternetOpenUrl(
 {
 	CString str;
 	CString cstrUrl = lpszUrl;
+	// 可从文件中读取拦截的domain
 	if (cstrUrl.Find(_T("baidu.com")) >= 0)
 	{
 		if (MessageBoxW(NULL,L"访问百度?",L"NOTICE",MB_YESNO)==IDYES)
@@ -54,7 +53,7 @@ HANDLE WINAPI myInternetOpenUrl(
 		} 
 		else
 		{
-			return INVALID_HANDLE_VALUE;
+			return NULL;
 		}
 	} 
 	else
@@ -121,8 +120,8 @@ VOID HookIEIAT()
 			if (*pAddr == dwFuncAddr)         
 			{
 				bFound = TRUE;         
-				pInternetOpenUrlAddrOrgin = pAddr;
-				dwInternetOpenUrlAddr = (InternetOpenUrlFunc)*pAddr;    
+				pInternetOpenUrlAddrOrgin = pAddr; // 保存 存储函数地址的 地址，方便下次还原
+				dwInternetOpenUrlAddr = (InternetOpenUrlFunc)*pAddr; // 保存InternetOpenUrlW函数地址    
 				DWORD dwMyHookAddr = (DWORD) myInternetOpenUrl;
 				// 修改此处地址为hook函数地址
 				WriteProcessMemory(GetCurrentProcess(),(LPVOID)pAddr,&dwMyHookAddr,sizeof(DWORD),NULL); 
@@ -143,6 +142,8 @@ VOID UnHookIEIAT()
 		WriteProcessMemory(GetCurrentProcess(),(LPVOID)pInternetOpenUrlAddrOrgin,&dwInternetOpenUrlAddr,sizeof(DWORD),NULL); 
 	}
 }
+
+// DLL 入口
 BOOL APIENTRY DllMain( HMODULE hModule,
 	DWORD  ul_reason_for_call,
 	LPVOID lpReserved

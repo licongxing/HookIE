@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "InjectDll.h"
+#include "InjectDllUtility.h"
 #include <TlHelp32.h>
 
 #ifndef PSAPI_VERSION
@@ -10,16 +10,46 @@
 #include <Psapi.h>  
 #pragma comment (lib,"Psapi.lib")  
 
-CInjectDll::CInjectDll(void)
+CInjectDllUtility::CInjectDllUtility(void)
 {
 }
 
 
-CInjectDll::~CInjectDll(void)
+CInjectDllUtility::~CInjectDllUtility(void)
 {
 }
 
-CString CInjectDll::GetModulePath(HMODULE hModule)
+BOOL CInjectDllUtility::IsWindows64()
+{
+	typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
+	LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)::GetProcAddress(GetModuleHandle(_T("kernel32")), "IsWow64Process");
+	BOOL bIsWow64 = FALSE;
+	if (fnIsWow64Process)
+		if (!fnIsWow64Process(::GetCurrentProcess(), &bIsWow64))
+			bIsWow64 = FALSE;
+	return bIsWow64;
+}
+
+CString CInjectDllUtility::GetIEPath()
+{
+	TCHAR szPath[MAX_PATH];
+	TCHAR *strLastSlash = NULL;
+	GetSystemDirectoryW(szPath, sizeof(szPath) );
+	szPath[MAX_PATH - 1] = 0;
+	strLastSlash = wcschr( szPath, L'\\' );
+	*strLastSlash = 0;
+	if ( IsWindows64() )
+	{
+		wcscat_s( szPath,L"\\program files (x86)\\internet explorer\\iexplore.exe" );
+	}
+	else
+	{
+		wcscat_s( szPath,L"\\program files\\internet explorer\\iexplore.exe" );
+	}
+	return CString(szPath);
+}
+
+CString CInjectDllUtility::GetModulePath(HMODULE hModule)
 {
 	TCHAR buf[MAX_PATH] = {'\0'};
 	CString strDir, strTemp;
@@ -30,11 +60,11 @@ CString CInjectDll::GetModulePath(HMODULE hModule)
 	return strDir;
 }
 
-void CInjectDll::GetProcessHandle(CString strExePath,std::list<HANDLE>& handleList)
+void CInjectDllUtility::GetProcessHandle(CString strExePath,std::list<HANDLE>& handleList)
 {
 	CString exeName ;
 	int index= strExePath.ReverseFind('\\');
-	exeName = strExePath.Right(strExePath.GetLength()-index);
+	exeName = strExePath.Right(strExePath.GetLength()-index-1);
 
 	HANDLE snapHandele = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,NULL);
 	if( INVALID_HANDLE_VALUE == snapHandele)
@@ -80,7 +110,7 @@ void CInjectDll::GetProcessHandle(CString strExePath,std::list<HANDLE>& handleLi
 	return;
 }
 
-void CInjectDll::InjectDllToExe(CString strDllPath,CString strExePath)
+void CInjectDllUtility::InjectDllToExe(CString strDllPath,CString strExePath)
 {
 	std::list<HANDLE> handleList;
 	GetProcessHandle(strExePath,handleList);
@@ -91,16 +121,17 @@ void CInjectDll::InjectDllToExe(CString strDllPath,CString strExePath)
 	{
 		targetProc = *it;
 		bool ret = InjectDllToProc(strDllPath, targetProc);
+		CloseHandle(targetProc);
 		if(ret == false)
 		{
 			AfxGetApp()->GetMainWnd()->MessageBox(_T("InjectDllToProc failed"));
 		}
-		CloseHandle(targetProc);
+		
 	}
 	return;
 }
 
-bool CInjectDll::InjectDllToProc(CString strDllPath, HANDLE targetProc)
+bool CInjectDllUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 {
 	if(targetProc == NULL)
 	{
@@ -143,11 +174,10 @@ bool CInjectDll::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 	}
 	WaitForSingleObject(tHandle,INFINITE);
 	CloseHandle(tHandle);
-	CloseHandle(targetProc);
 	return true;
 }
 
-void CInjectDll::UninstallDllToExe(CString strDllPath,CString strExePath)
+void CInjectDllUtility::UninstallDllToExe(CString strDllPath,CString strExePath)
 {
 	std::list<HANDLE> handleList;
 	GetProcessHandle(strExePath,handleList);
@@ -158,16 +188,17 @@ void CInjectDll::UninstallDllToExe(CString strDllPath,CString strExePath)
 	{
 		targetProc = *it;
 		bool ret = UninstallDllToProc(strDllPath, targetProc);
+		CloseHandle(targetProc);
 		if(ret == false)
 		{
 			AfxGetApp()->GetMainWnd()->MessageBox(_T("UninstallDllToProc failed"));
 		}
-		CloseHandle(targetProc);
+		
 	}
 	return;
 }
 
-bool CInjectDll::UninstallDllToProc(CString strDllPath, HANDLE targetProc)
+bool CInjectDllUtility::UninstallDllToProc(CString strDllPath, HANDLE targetProc)
 {
     /*
     卸载步骤和注入DLL步骤实质差不多.
@@ -224,7 +255,6 @@ bool CInjectDll::UninstallDllToProc(CString strDllPath, HANDLE targetProc)
     }
     WaitForSingleObject(tHandle,INFINITE);
     CloseHandle(tHandle);
-    CloseHandle(targetProc);
 	return true;
 }
 

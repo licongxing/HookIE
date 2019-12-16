@@ -55,4 +55,5 @@
 #endif
 #endif
 
+#include "InjectDllUtility.h"
 

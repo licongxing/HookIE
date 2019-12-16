@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "afxwin.h"
 
 
 // CHookIEDlg 对话框
@@ -29,4 +30,13 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+private:
+	// 拦截的域名
+	CString m_uiDomain;
+public:
+	afx_msg void OnBnClickedBtnHookie();
+	afx_msg void OnBnClickedBtnUnhookie();
+private:
+	CButton m_uiHookIEBtn;
+	CButton m_uiUnHookIEBtn;
 };

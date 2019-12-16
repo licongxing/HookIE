@@ -1,11 +1,16 @@
 #pragma once
 #include <list>
 
-class CInjectDll
+class CInjectDllUtility
 {
 public:
-	CInjectDll(void);
-	~CInjectDll(void);
+	CInjectDllUtility(void);
+	~CInjectDllUtility(void);
+
+	// 判断是否为64位操作系统
+	static BOOL IsWindows64();
+
+	static CString GetIEPath();
 
 	// 获取进程句柄所在的路径
 	static CString GetModulePath(HMODULE hModule = NULL);
