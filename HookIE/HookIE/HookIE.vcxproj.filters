@@ -39,7 +39,7 @@
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="InjectDllUtility.h">
+    <ClInclude Include="..\include\Utility.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -53,7 +53,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="InjectDllUtility.cpp">
+    <ClCompile Include="..\include\Utility.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

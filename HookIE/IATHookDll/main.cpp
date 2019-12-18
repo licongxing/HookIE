@@ -70,6 +70,10 @@ HANDLE WINAPI myInternetOpenUrl(
 
 VOID HookIEIAT()
 {
+#ifdef TEXT_LOG
+	CUtility::TextLog(_T("VOID HookIEIAT"),_T("do"));
+#endif
+	
 	// 进程基址
 	HMODULE hModule = GetModuleHandleA(NULL); // 当前EXE句柄
 	
@@ -149,10 +153,15 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	LPVOID lpReserved
 	)
 {
+	CUtility::InitLog(_T("testlog_IATHookDll_"),CUtility::GetModulePath());
+	CUtility::TextLog(_T("aaaa"),_T("bbbb"));
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
-		HookIEIAT();
+		{
+			CUtility::InitLog(_T("testlog_IATHookDll_"),CUtility::GetModulePath());
+			HookIEIAT();
+		}
 		break;
 	case DLL_PROCESS_DETACH:
 		UnHookIEIAT();

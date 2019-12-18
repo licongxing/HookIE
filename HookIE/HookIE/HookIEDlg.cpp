@@ -168,18 +168,18 @@ void CHookIEDlg::OnBnClickedBtnHookie()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
-	CString iePath = CInjectDllUtility::GetIEPath();
+	CString iePath = CUtility::GetIEPath();
 	//CString iePath = _T("C:\\Program Files\\internet explorer\\iexplore.exe");
-	CString dllPath = CInjectDllUtility::GetModulePath() + _T("IATHookDll.dll");
-	CInjectDllUtility::InjectDllToExe(dllPath,iePath);
+	CString dllPath = CUtility::GetModulePath() + _T("IATHookDll.dll");
+	CUtility::InjectDllToExe(dllPath,iePath);
 }
 
 
 void CHookIEDlg::OnBnClickedBtnUnhookie()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	CString iePath = CInjectDllUtility::GetIEPath();
+	CString iePath = CUtility::GetIEPath();
 	//CString iePath = _T("C:\\Program Files\\internet explorer\\iexplore.exe");
-	CString dllPath = CInjectDllUtility::GetModulePath() + _T("IATHookDll.dll");
-	CInjectDllUtility::InjectDllToExe(dllPath,iePath);
+	CString dllPath = CUtility::GetModulePath() + _T("IATHookDll.dll");
+	CUtility::InjectDllToExe(dllPath,iePath);
 }

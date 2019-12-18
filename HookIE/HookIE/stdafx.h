@@ -55,5 +55,7 @@
 #endif
 #endif
 
-#include "InjectDllUtility.h"
+#include "Utility.h"
+
+#define TEXT_LOG
 

@@ -67,6 +67,8 @@ BOOL CHookIEApp::InitInstance()
 	// 例如修改为公司或组织名
 	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
 
+	CUtility::InitLog(_T("testlog_hookie_"),CUtility::GetModulePath());
+
 	CHookIEDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
