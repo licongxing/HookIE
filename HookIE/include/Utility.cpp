@@ -191,7 +191,9 @@ bool CUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 	4. 在目标进程 创建线程并执行(使用CreateRemoteThread)
 	*/
 
-	int dllLen = strDllPath.GetLength();
+	std::string temp = W2Astring(strDllPath);
+	int dllLen = temp.size();
+	const char* pPath = temp.c_str();
 	// 1.目标进程申请空间
 	LPVOID pDLLPath = VirtualAllocEx(targetProc,NULL,dllLen,MEM_COMMIT,PAGE_READWRITE );
 	if( pDLLPath == NULL )
@@ -200,7 +202,7 @@ bool CUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 	}
 	SIZE_T wLen = 0;
 	// 2.将DLL路径写进目标进程内存空间
-	int ret = WriteProcessMemory(targetProc,pDLLPath,strDllPath,dllLen,&wLen);
+	int ret = WriteProcessMemory(targetProc,pDLLPath,pPath,dllLen,&wLen);
 	if( ret == 0 )
 	{
 		return false;
@@ -277,8 +279,9 @@ bool CUtility::UninstallDllToProc(CString strDllPath, HANDLE targetProc)
     HMODULE dllHandle = NULL;
 	CString tempDllPath;
     while (ret) {
-        tempDllPath = entry.szModule;
-        if(tempDllPath.CompareNoCase((strDllPath)))
+        //tempDllPath = entry.szModule;
+		tempDllPath = entry.szExePath;
+        if(tempDllPath.CompareNoCase((strDllPath)) == 0)
         {
             dllHandle = entry.hModule;
             break;
@@ -308,5 +311,29 @@ bool CUtility::UninstallDllToProc(CString strDllPath, HANDLE targetProc)
     WaitForSingleObject(tHandle,INFINITE);
     CloseHandle(tHandle);
 	return true;
+}
+
+CStringW CUtility::A2Wstring(std::string strA)
+
+{
+	int UnicodeLen = ::MultiByteToWideChar(CP_ACP,0,strA.c_str(),-1,NULL,0);
+	wchar_t *pUnicode = new wchar_t[UnicodeLen*1]();
+	::MultiByteToWideChar(CP_ACP,0,strA.c_str(),strA.size(),pUnicode,UnicodeLen);
+	CString str(pUnicode);
+	delete []pUnicode;
+	return str;
+}
+
+std::string CUtility::W2Astring(const CString& strUnicode)
+{
+	char *pElementText = NULL;
+	int iTextLen ;
+	iTextLen = ::WideCharToMultiByte(CP_ACP,0,strUnicode,-1,NULL,0,NULL,NULL);
+	pElementText = new char[iTextLen +1];
+	memset(pElementText,0,(iTextLen+1)*sizeof(char));
+	::WideCharToMultiByte(CP_ACP,0,strUnicode,strUnicode.GetLength(),pElementText,iTextLen,NULL,NULL);
+	std::string str(pElementText);
+	delete []pElementText;
+	return str;
 }
 

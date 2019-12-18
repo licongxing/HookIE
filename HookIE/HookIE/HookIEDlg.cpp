@@ -51,6 +51,7 @@ END_MESSAGE_MAP()
 CHookIEDlg::CHookIEDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CHookIEDlg::IDD, pParent)
 	, m_uiDomain(_T(""))
+	, m_uiHookExePath(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -61,6 +62,7 @@ void CHookIEDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_DOMAIN, m_uiDomain);
 	DDX_Control(pDX, IDC_BTN_HOOKIE, m_uiHookIEBtn);
 	DDX_Control(pDX, IDC_BTN_UNHOOKIE, m_uiUnHookIEBtn);
+	DDX_Text(pDX, IDC_EDIT_EXE_PATH, m_uiHookExePath);
 }
 
 BEGIN_MESSAGE_MAP(CHookIEDlg, CDialogEx)
@@ -168,10 +170,18 @@ void CHookIEDlg::OnBnClickedBtnHookie()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
-	CString iePath = CUtility::GetIEPath();
+	CString exePath;
 	//CString iePath = _T("C:\\Program Files\\internet explorer\\iexplore.exe");
 	CString dllPath = CUtility::GetModulePath() + _T("IATHookDll.dll");
-	CUtility::InjectDllToExe(dllPath,iePath);
+	if(m_uiHookExePath.IsEmpty())
+	{
+		exePath = CUtility::GetIEPath();
+	}
+	else
+	{
+		exePath = m_uiHookExePath;
+	}
+	CUtility::InjectDllToExe(dllPath,exePath);
 }
 
 
@@ -181,5 +191,5 @@ void CHookIEDlg::OnBnClickedBtnUnhookie()
 	CString iePath = CUtility::GetIEPath();
 	//CString iePath = _T("C:\\Program Files\\internet explorer\\iexplore.exe");
 	CString dllPath = CUtility::GetModulePath() + _T("IATHookDll.dll");
-	CUtility::InjectDllToExe(dllPath,iePath);
+	CUtility::UninstallDllToExe(dllPath,iePath);
 }

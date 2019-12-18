@@ -13,6 +13,7 @@ private:
 	static bool m_bInitLog;
 
 public:
+	// 初始化日志
 	static void InitLog(CString logFilePrefix,CString logFilePath);
 	
 	// 打印日志
@@ -41,6 +42,12 @@ public:
 
 	// 指定DLL从指定进程句柄卸载
 	static bool  UninstallDllToProc(CString strDllPath, HANDLE targetProc);
+
+
+
+	static CStringW CUtility::A2Wstring(std::string strA);
+
+	static std::string CUtility::W2Astring(const CString& strUnicode);
 
 };
 

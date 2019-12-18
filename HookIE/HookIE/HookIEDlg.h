@@ -39,4 +39,6 @@ public:
 private:
 	CButton m_uiHookIEBtn;
 	CButton m_uiUnHookIEBtn;
+	// 需要hook的exe路径
+	CString m_uiHookExePath;
 };
