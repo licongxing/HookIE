@@ -202,7 +202,7 @@ bool CUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 	}
 	SIZE_T wLen = 0;
 	// 2.将DLL路径写进目标进程内存空间
-	int ret = WriteProcessMemory(targetProc,pDLLPath,pPath,dllLen,&wLen);
+	int ret = WriteProcessMemory(targetProc,pDLLPath,pPath,dllLen,&wLen); // 这里pPath不能直接使用strDllPath
 	if( ret == 0 )
 	{
 		return false;
