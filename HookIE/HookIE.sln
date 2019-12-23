@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HookIE", "HookIE\HookIE.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IATHookDll", "IATHookDll\IATHookDll.vcxproj", "{A7EC9087-3315-4E71-A277-9CB1D6A1A016}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ring3DataIntercept", "Ring3DataIntercept\Ring3DataIntercept.vcxproj", "{BA76198D-A9E4-4C7F-B851-6C9F4A3CD957}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,10 @@ Global
 		{A7EC9087-3315-4E71-A277-9CB1D6A1A016}.Debug|Win32.Build.0 = Debug|Win32
 		{A7EC9087-3315-4E71-A277-9CB1D6A1A016}.Release|Win32.ActiveCfg = Release|Win32
 		{A7EC9087-3315-4E71-A277-9CB1D6A1A016}.Release|Win32.Build.0 = Release|Win32
+		{BA76198D-A9E4-4C7F-B851-6C9F4A3CD957}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BA76198D-A9E4-4C7F-B851-6C9F4A3CD957}.Debug|Win32.Build.0 = Debug|Win32
+		{BA76198D-A9E4-4C7F-B851-6C9F4A3CD957}.Release|Win32.ActiveCfg = Release|Win32
+		{BA76198D-A9E4-4C7F-B851-6C9F4A3CD957}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

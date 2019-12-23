@@ -41,4 +41,5 @@ private:
 	CButton m_uiUnHookIEBtn;
 	// 需要hook的exe路径
 	CString m_uiHookExePath;
+	CString m_uiDllPath;
 };

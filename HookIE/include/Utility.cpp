@@ -2,6 +2,7 @@
 #include "Utility.h"
 #include <TlHelp32.h>
 #include <string> // std::locale需要
+#include <strsafe.h> // StringCchPrintf 需要
 
 // 日志打印
 #include "LogPolicy.h"
@@ -198,6 +199,9 @@ bool CUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 	LPVOID pDLLPath = VirtualAllocEx(targetProc,NULL,dllLen,MEM_COMMIT,PAGE_READWRITE );
 	if( pDLLPath == NULL )
 	{
+#ifdef TEXT_LOG
+		CUtility::TextErrorLog(_T("CUtility::InjectDllToProc VirtualAllocEx failed"));
+#endif
 		return false;
 	}
 	SIZE_T wLen = 0;
@@ -205,12 +209,18 @@ bool CUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 	int ret = WriteProcessMemory(targetProc,pDLLPath,pPath,dllLen,&wLen); // 这里pPath不能直接使用strDllPath
 	if( ret == 0 )
 	{
+#ifdef TEXT_LOG
+		CUtility::TextErrorLog(_T("CUtility::InjectDllToProc WriteProcessMemory failed"));
+#endif
 		return false;
 	}
 	// 3.获取LoadLibraryA函数地址
 	FARPROC myLoadLibrary = GetProcAddress(GetModuleHandleA("kernel32.dll"),"LoadLibraryA");
 	if( myLoadLibrary == NULL )
 	{
+#ifdef TEXT_LOG
+		CUtility::TextErrorLog(_T("CUtility::InjectDllToProc GetProcAddress failed"));
+#endif
 		return false;
 	}
 	// 4.在目标进程执行LoadLibrary 注入指定的线程
@@ -218,6 +228,9 @@ bool CUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 		(LPTHREAD_START_ROUTINE)myLoadLibrary,pDLLPath,NULL,NULL);
 	if(tHandle == NULL)
 	{
+#ifdef TEXT_LOG
+		CUtility::TextErrorLog(_T("CUtility::InjectDllToProc CreateRemoteThread failed"));
+#endif
 		return false;
 	}
 	WaitForSingleObject(tHandle,INFINITE);
@@ -337,3 +350,47 @@ std::string CUtility::W2Astring(const CString& strUnicode)
 	return str;
 }
 
+
+
+void CUtility::TextErrorLog(CString cstrKey)
+{
+	DWORD errorCode = GetLastError();
+	CString errorMsg = CUtility::GetErrorMsg(errorCode);
+	CString cstrTemp ;
+	cstrTemp.Format(_T("errorCode:%d,errorMsg:%s"),errorCode,errorMsg);
+	CUtility::TextLog(cstrKey,cstrTemp);
+}
+
+CString CUtility::GetErrorMsg(DWORD errorCode)
+{
+	{   
+		// Retrieve the system error message for the last-error code  
+
+		LPVOID lpMsgBuf;  
+		LPVOID lpDisplayBuf;  
+
+		FormatMessage(  
+			FORMAT_MESSAGE_ALLOCATE_BUFFER |   
+			FORMAT_MESSAGE_FROM_SYSTEM |  
+			FORMAT_MESSAGE_IGNORE_INSERTS,  
+			NULL,  
+			errorCode,  
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),  
+			(LPTSTR) &lpMsgBuf,  
+			0, NULL );  
+
+		// Display the error message and exit the process  
+
+		lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,   
+			(lstrlen((LPCTSTR)lpMsgBuf)+40)*sizeof(TCHAR));   
+
+		StringCchPrintf((LPTSTR)lpDisplayBuf,   
+			LocalSize(lpDisplayBuf),  
+			TEXT("%s"),   
+			lpMsgBuf);  
+		CString result = (LPTSTR)lpDisplayBuf;
+		LocalFree(lpMsgBuf);  
+		LocalFree(lpDisplayBuf);     
+		return result;
+	}
+}

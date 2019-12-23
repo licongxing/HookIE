@@ -49,5 +49,9 @@ public:
 
 	static std::string CUtility::W2Astring(const CString& strUnicode);
 
+	// 获取errorCode的信息然后打印
+	static void TextErrorLog(CString cstrKey);
+
+	static CString GetErrorMsg(DWORD errorCode);
 };
 

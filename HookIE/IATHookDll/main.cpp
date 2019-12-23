@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <Wininet.h>
 
+
 //定义函数指针，和InternetOpenUrlW一致
 typedef HINTERNET (* WINAPI InternetOpenUrlFunc)(
 	_In_ HINTERNET hInternet,
@@ -38,6 +39,7 @@ HANDLE WINAPI myInternetOpenUrl(
 {
 	CString str;
 	CString cstrUrl = lpszUrl;
+	OutputDebugString(_T("myInternetOpenUrl into"));
 	// 可从文件中读取拦截的domain
 	if (cstrUrl.Find(_T("baidu.com")) >= 0)
 	{
@@ -70,13 +72,19 @@ HANDLE WINAPI myInternetOpenUrl(
 
 VOID HookIEIAT()
 {
-#ifdef TEXT_LOG
-	CUtility::TextLog(_T("VOID HookIEIAT"),_T("do"));
-#endif
+	OutputDebugString(_T("HookIEIAT into"));
 	
+	//---- 这里一定要注意,获取的基址 一定是我们hook的 动态库 所在的PE程序的基址  --------- //
+	// WININET.dll 并不是直接在iexplore.exe中，而是在ieframe.dll中
 	// 进程基址
-	HMODULE hModule = GetModuleHandleA(NULL); // 当前EXE句柄
-	
+	//HMODULE hModule = GetModuleHandleA(NULL); // 当前EXE句柄
+	// dll基址
+	HMODULE hModule = LoadLibrary(_T("ieframe.dll")); //
+
+
+
+
+	OutputDebugString(_T("HookIEIAT into  1111"));
 	// 定位PE结构
 	PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)hModule; // DOS头
 	PIMAGE_NT_HEADERS pNTHeader = (PIMAGE_NT_HEADERS)((DWORD)hModule+pDosHeader->e_lfanew); // PE头起始位置
@@ -92,7 +100,7 @@ VOID HookIEIAT()
 	// 进程中InternetOpenUrlW的地址
 	HMODULE handle=LoadLibraryA("WININET.dll");
 	DWORD dwFuncAddr = (DWORD)GetProcAddress(handle,"InternetOpenUrlW");
-
+	OutputDebugString(_T("HookIEIAT into  2222"));
 	BOOL bFound = FALSE;
 	// 查找欲hook函数的模块名
 	while (pTempImgDes->Name) // 结构体全0为结束标志
@@ -100,15 +108,18 @@ VOID HookIEIAT()
 		DWORD dwNameAddr = dwImageBase + pTempImgDes->Name;
 		char szName[MAXBYTE]={0};
 		strcpy(szName,(char*)dwNameAddr);
+		
 		CString cstrName = szName;
+		OutputDebugString(cstrName);
 		if (cstrName.CompareNoCase(_T("WININET.dll")) == 0 )
 		{
+			OutputDebugString(_T("WININET.dll find"));
 			bFound = TRUE;
 			break;
 		}
 		pTempImgDes ++; // 继续下一个导入表，一个导入表结构和一个DLL对应
 	}
-
+	OutputDebugString(_T("HookIEIAT into  3333"));
 	// 判断是否找到欲hook函数所在的函数名
 	if (bFound==TRUE)
 	{
@@ -127,12 +138,45 @@ VOID HookIEIAT()
 				pInternetOpenUrlAddrOrgin = pAddr; // 保存 存储函数地址的 地址，方便下次还原
 				dwInternetOpenUrlAddr = (InternetOpenUrlFunc)*pAddr; // 保存InternetOpenUrlW函数地址    
 				DWORD dwMyHookAddr = (DWORD) myInternetOpenUrl;
+
+				DWORD oldProtect = 0;
+				BOOL ret  = FALSE;
+				// 修改页保护为可读可写
+				ret = VirtualProtect(pAddr,sizeof(ULONG),PAGE_READWRITE,&oldProtect);
+				if(ret == FALSE)
+				{
+					DWORD errorCode = GetLastError();
+					CString errorMsg = CUtility::GetErrorMsg(errorCode);
+					CString msg ;
+					msg.Format(_T("VirtualProtect false !!! errorCode:%d,errorMsg:%s \n"),errorCode,errorMsg);
+					OutputDebugString(msg);
+					return;
+				}
 				// 修改此处地址为hook函数地址
-				WriteProcessMemory(GetCurrentProcess(),(LPVOID)pAddr,&dwMyHookAddr,sizeof(DWORD),NULL); 
-				break;
+				ret = WriteProcessMemory(GetCurrentProcess(),(LPVOID)pAddr,&dwMyHookAddr,sizeof(DWORD),NULL); 
+				if(ret == FALSE)
+				{
+					DWORD errorCode = GetLastError();
+					CString errorMsg = CUtility::GetErrorMsg(errorCode);
+					CString msg ;
+					msg.Format(_T("WriteProcessMemory false !!! errorCode:%d,errorMsg:%s \n"),errorCode,errorMsg);
+					OutputDebugString(msg);
+					return;
+				}
+				else
+				{
+					OutputDebugString(_T("WriteProcessMemory true"));
+				}
+				// 页保护属性改回去
+				VirtualProtect(pAddr,sizeof(ULONG),oldProtect,NULL);
+				return;
 			}
 			pThunk ++; // 继续下一个导入地址表结构体，一个函数和一个导入地址表结构体对应
 		}
+	}
+	else
+	{
+		OutputDebugString(_T("HookIEIAT into  55555"));
 	}
 
 	return;
@@ -140,10 +184,38 @@ VOID HookIEIAT()
 
 VOID UnHookIEIAT()
 {
+	OutputDebugString(_T("UnHookIEIAT into"));
 	if(dwInternetOpenUrlAddr)
 	{
+		DWORD oldProtect = 0;
+		BOOL ret  = FALSE;
+		// 修改页保护为可读可写
+		ret = VirtualProtect(pInternetOpenUrlAddrOrgin,sizeof(ULONG),PAGE_READWRITE,&oldProtect);
+		if(ret == FALSE)
+		{
+			DWORD errorCode = GetLastError();
+			CString errorMsg = CUtility::GetErrorMsg(errorCode);
+			CString msg ;
+			msg.Format(_T("VirtualProtect false !!! errorCode:%d,errorMsg:%s \n"),errorCode,errorMsg);
+			OutputDebugString(msg);
+			return;
+		}
 		// 如果被hook了，被hook地方还原为原来地址
-		WriteProcessMemory(GetCurrentProcess(),(LPVOID)pInternetOpenUrlAddrOrgin,&dwInternetOpenUrlAddr,sizeof(DWORD),NULL); 
+		ret = WriteProcessMemory(GetCurrentProcess(),(LPVOID)pInternetOpenUrlAddrOrgin,&dwInternetOpenUrlAddr,sizeof(DWORD),NULL); 
+		if(ret == FALSE)
+		{
+			DWORD errorCode = GetLastError();
+			CString errorMsg = CUtility::GetErrorMsg(errorCode);
+			CString msg ;
+			msg.Format(_T("WriteProcessMemory false !!! errorCode:%d,errorMsg:%s \n"),errorCode,errorMsg);
+			OutputDebugString(msg);
+			return;
+		}
+		else
+		{
+			OutputDebugString(_T("WriteProcessMemory true"));
+		}
+	
 	}
 }
 
@@ -153,13 +225,10 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	LPVOID lpReserved
 	)
 {
-	CUtility::InitLog(_T("testlog_IATHookDll_"),CUtility::GetModulePath());
-	CUtility::TextLog(_T("aaaa"),_T("bbbb"));
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
 		{
-			CUtility::InitLog(_T("testlog_IATHookDll_"),CUtility::GetModulePath());
 			HookIEIAT();
 		}
 		break;
