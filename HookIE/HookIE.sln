@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IATHookDll", "IATHookDll\IA
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ring3DataIntercept", "Ring3DataIntercept\Ring3DataIntercept.vcxproj", "{BA76198D-A9E4-4C7F-B851-6C9F4A3CD957}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InlineHook", "InlineHook\InlineHook.vcxproj", "{6BB94ADC-FB96-423A-B2A6-F0B03EA5DC23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -25,6 +27,10 @@ Global
 		{BA76198D-A9E4-4C7F-B851-6C9F4A3CD957}.Debug|Win32.Build.0 = Debug|Win32
 		{BA76198D-A9E4-4C7F-B851-6C9F4A3CD957}.Release|Win32.ActiveCfg = Release|Win32
 		{BA76198D-A9E4-4C7F-B851-6C9F4A3CD957}.Release|Win32.Build.0 = Release|Win32
+		{6BB94ADC-FB96-423A-B2A6-F0B03EA5DC23}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6BB94ADC-FB96-423A-B2A6-F0B03EA5DC23}.Debug|Win32.Build.0 = Debug|Win32
+		{6BB94ADC-FB96-423A-B2A6-F0B03EA5DC23}.Release|Win32.ActiveCfg = Release|Win32
+		{6BB94ADC-FB96-423A-B2A6-F0B03EA5DC23}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
