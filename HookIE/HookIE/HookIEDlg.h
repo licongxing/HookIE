@@ -30,16 +30,10 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
-private:
-	// 拦截的域名
-	CString m_uiDomain;
 public:
 	afx_msg void OnBnClickedBtnHookie();
 	afx_msg void OnBnClickedBtnUnhookie();
 private:
 	CButton m_uiHookIEBtn;
 	CButton m_uiUnHookIEBtn;
-	// 需要hook的exe路径
-	CString m_uiHookExePath;
-	CString m_uiDllPath;
 };

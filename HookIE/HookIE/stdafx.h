@@ -57,5 +57,4 @@
 
 #include "Utility.h"
 
-#define TEXT_LOG
 

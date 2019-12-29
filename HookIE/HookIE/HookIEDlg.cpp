@@ -50,9 +50,6 @@ END_MESSAGE_MAP()
 
 CHookIEDlg::CHookIEDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CHookIEDlg::IDD, pParent)
-	, m_uiDomain(_T(""))
-	, m_uiHookExePath(_T(""))
-	, m_uiDllPath(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -60,11 +57,8 @@ CHookIEDlg::CHookIEDlg(CWnd* pParent /*=NULL*/)
 void CHookIEDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Text(pDX, IDC_EDIT_DOMAIN, m_uiDomain);
 	DDX_Control(pDX, IDC_BTN_HOOKIE, m_uiHookIEBtn);
 	DDX_Control(pDX, IDC_BTN_UNHOOKIE, m_uiUnHookIEBtn);
-	DDX_Text(pDX, IDC_EDIT_EXE_PATH, m_uiHookExePath);
-	DDX_Text(pDX, IDC_EDIT_DLL_PATH, m_uiDllPath);
 }
 
 BEGIN_MESSAGE_MAP(CHookIEDlg, CDialogEx)
@@ -108,11 +102,6 @@ BOOL CHookIEDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	m_uiDomain = _T("baidu.com");
-	UpdateData(FALSE);
-
-
-
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -171,26 +160,9 @@ HCURSOR CHookIEDlg::OnQueryDragIcon()
 void CHookIEDlg::OnBnClickedBtnHookie()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	UpdateData(TRUE);
 	CString exePath,dllPath;
-	//CString iePath = _T("C:\\Program Files\\internet explorer\\iexplore.exe");
-	
-	if(m_uiHookExePath.IsEmpty())
-	{
-		exePath = CUtility::GetIEPath();
-	}
-	else
-	{
-		exePath = m_uiHookExePath;
-	}
-	if(m_uiDllPath.IsEmpty())
-	{
-		dllPath = CUtility::GetModulePath() + _T("IATHookDll.dll");
-	}
-	else
-	{
-		dllPath = m_uiDllPath;
-	}
+	exePath = CUtility::GetIEPath();
+	dllPath = CUtility::GetModulePath() + _T("InlineHook.dll");
 	CUtility::InjectDllToExe(dllPath,exePath);
 }
 
@@ -198,25 +170,8 @@ void CHookIEDlg::OnBnClickedBtnHookie()
 void CHookIEDlg::OnBnClickedBtnUnhookie()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	UpdateData(TRUE);
 	CString exePath,dllPath;
-	//CString iePath = _T("C:\\Program Files\\internet explorer\\iexplore.exe");
-
-	if(m_uiHookExePath.IsEmpty())
-	{
-		exePath = CUtility::GetIEPath();
-	}
-	else
-	{
-		exePath = m_uiHookExePath;
-	}
-	if(m_uiDllPath.IsEmpty())
-	{
-		dllPath = CUtility::GetModulePath() + _T("IATHookDll.dll");
-	}
-	else
-	{
-		dllPath = m_uiDllPath;
-	}
+	exePath = CUtility::GetIEPath();
+	dllPath = CUtility::GetModulePath() + _T("InlineHook.dll");
 	CUtility::UninstallDllToExe(dllPath,exePath);
 }

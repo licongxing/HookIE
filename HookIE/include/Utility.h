@@ -13,12 +13,6 @@ private:
 	static bool m_bInitLog;
 
 public:
-	// 初始化日志
-	static void InitLog(CString logFilePrefix,CString logFilePath);
-	
-	// 打印日志
-	static void TextLog(CString strKey,CString strValue);
-
 	// 判断是否为64位操作系统
 	static BOOL IsWindows64();
 
@@ -48,9 +42,6 @@ public:
 	static CStringW CUtility::A2Wstring(std::string strA);
 
 	static std::string CUtility::W2Astring(const CString& strUnicode);
-
-	// 获取errorCode的信息然后打印
-	static void TextErrorLog(CString cstrKey);
 
 	static CString GetErrorMsg(DWORD errorCode);
 };

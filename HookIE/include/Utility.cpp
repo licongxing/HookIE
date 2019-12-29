@@ -29,38 +29,6 @@ CUtility::~CUtility(void)
 {
 }
 
-void CUtility::InitLog(CString logFilePrefix,CString logFilePath)
-{
-	if(m_bInitLog == true)
-		return;
-
-	m_bInitLog = true;
-	// 日志初始化
-	std::locale::global(std::locale(""));
-
-	g_pFileLog = new FilePolicy(NULL);
-	g_pThreadSafeLog = new ThreadSafePolicy(g_pFileLog);
-
-	g_pFileLog->setprefix(logFilePrefix);
-	g_pFileLog->setpath(logFilePath);
-	g_pThreadSafeLog->setloglevel(LOGSYSTEM);
-
-#ifdef TEXT_LOG
-	g_pThreadSafeLog->setloglevel(LOGDEBUG);
-#endif
-}
-
-void CUtility::TextLog(CString strKey,CString strValue)
-{
-	CString logInfo;
-	CString strkey = L"[ ";
-	strkey.Append(strKey);
-	strkey.Append(L" ] ");
-	logInfo.Append(strkey);
-	logInfo.Append(strValue);
-	g_pThreadSafeLog->Log(LOGINFO,logInfo);
-}
-
 BOOL CUtility::IsWindows64()
 {
 	typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
@@ -166,12 +134,9 @@ void CUtility::InjectDllToExe(CString strDllPath,CString strExePath)
 		CloseHandle(targetProc);
 		if(ret == false)
 		{
-			//AfxGetApp()->GetMainWnd()->MessagekBox(_T("InjectDllToProc failed"));
-#ifdef TEXT_LOG
-			CString temp;
-			temp.Format(_T("handle:%d false"),targetProc);
-			CUtility::TextLog(_T("CUtility::InjectDllToExe"),temp);
-#endif
+			CString temp = _T("CUtility::InjectDllToExe");
+			temp.AppendFormat(_T("handle:%d false\n"),targetProc);
+			TRACE(temp);
 		}
 		
 	}
@@ -199,9 +164,7 @@ bool CUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 	LPVOID pDLLPath = VirtualAllocEx(targetProc,NULL,dllLen,MEM_COMMIT,PAGE_READWRITE );
 	if( pDLLPath == NULL )
 	{
-#ifdef TEXT_LOG
-		CUtility::TextErrorLog(_T("CUtility::InjectDllToProc VirtualAllocEx failed"));
-#endif
+		TRACE(_T("CUtility::InjectDllToProc VirtualAllocEx failed\n"));
 		return false;
 	}
 	SIZE_T wLen = 0;
@@ -209,18 +172,14 @@ bool CUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 	int ret = WriteProcessMemory(targetProc,pDLLPath,pPath,dllLen,&wLen); // 这里pPath不能直接使用strDllPath
 	if( ret == 0 )
 	{
-#ifdef TEXT_LOG
-		CUtility::TextErrorLog(_T("CUtility::InjectDllToProc WriteProcessMemory failed"));
-#endif
+		TRACE(_T("CUtility::InjectDllToProc WriteProcessMemory failed\n"));
 		return false;
 	}
 	// 3.获取LoadLibraryA函数地址
 	FARPROC myLoadLibrary = GetProcAddress(GetModuleHandleA("kernel32.dll"),"LoadLibraryA");
 	if( myLoadLibrary == NULL )
 	{
-#ifdef TEXT_LOG
-		CUtility::TextErrorLog(_T("CUtility::InjectDllToProc GetProcAddress failed"));
-#endif
+		TRACE(_T("CUtility::InjectDllToProc GetProcAddress failed\n"));
 		return false;
 	}
 	// 4.在目标进程执行LoadLibrary 注入指定的线程
@@ -228,9 +187,7 @@ bool CUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 		(LPTHREAD_START_ROUTINE)myLoadLibrary,pDLLPath,NULL,NULL);
 	if(tHandle == NULL)
 	{
-#ifdef TEXT_LOG
-		CUtility::TextErrorLog(_T("CUtility::InjectDllToProc CreateRemoteThread failed"));
-#endif
+		TRACE(_T("CUtility::InjectDllToProc CreateRemoteThread failed\n"));
 		return false;
 	}
 	WaitForSingleObject(tHandle,INFINITE);
@@ -252,13 +209,9 @@ void CUtility::UninstallDllToExe(CString strDllPath,CString strExePath)
 		CloseHandle(targetProc);
 		if(ret == false)
 		{
-			//AfxGetApp()->GetMainWnd()->MessageBox(_T("UninstallDllToProc failed"));
-#ifdef TEXT_LOG
-			CString temp;
-			temp.Format(_T("handle:%d false"),targetProc);
-			CUtility::TextLog(_T("CUtility::UninstallDllToExe"),temp);
-#endif
-			
+			CString temp = _T("CUtility::UninstallDllToExe");
+			temp.Format(_T("handle:%d false\n"),targetProc);
+			TRACE(temp);
 		}
 		
 	}
@@ -350,16 +303,6 @@ std::string CUtility::W2Astring(const CString& strUnicode)
 	return str;
 }
 
-
-
-void CUtility::TextErrorLog(CString cstrKey)
-{
-	DWORD errorCode = GetLastError();
-	CString errorMsg = CUtility::GetErrorMsg(errorCode);
-	CString cstrTemp ;
-	cstrTemp.Format(_T("errorCode:%d,errorMsg:%s"),errorCode,errorMsg);
-	CUtility::TextLog(cstrKey,cstrTemp);
-}
 
 CString CUtility::GetErrorMsg(DWORD errorCode)
 {
