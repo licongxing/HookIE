@@ -4,12 +4,6 @@
 #include <string> // std::locale需要
 #include <strsafe.h> // StringCchPrintf 需要
 
-// 日志打印
-#include "LogPolicy.h"
-ConsolePolicy* g_pConsoleLog;
-FilePolicy* g_pFileLog;
-ThreadSafePolicy* g_pThreadSafeLog;
-
 // GetModuleFileNameEx 需要下面几行
 #ifndef PSAPI_VERSION
 #define PSAPI_VERSION 1
