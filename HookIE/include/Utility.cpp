@@ -172,6 +172,7 @@ bool CUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 	int ret = WriteProcessMemory(targetProc,pDLLPath,pPath,dllLen,&wLen); // 这里pPath不能直接使用strDllPath
 	if( ret == 0 )
 	{
+		VirtualFreeEx(targetProc, pDLLPath, dllLen, MEM_DECOMMIT);
 		TRACE(_T("CUtility::InjectDllToProc WriteProcessMemory failed\n"));
 		return false;
 	}
@@ -179,6 +180,7 @@ bool CUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 	FARPROC myLoadLibrary = GetProcAddress(GetModuleHandleA("kernel32.dll"),"LoadLibraryA");
 	if( myLoadLibrary == NULL )
 	{
+		VirtualFreeEx(targetProc, pDLLPath, dllLen, MEM_DECOMMIT);
 		TRACE(_T("CUtility::InjectDllToProc GetProcAddress failed\n"));
 		return false;
 	}
@@ -187,10 +189,12 @@ bool CUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 		(LPTHREAD_START_ROUTINE)myLoadLibrary,pDLLPath,NULL,NULL);
 	if(tHandle == NULL)
 	{
+		VirtualFreeEx(targetProc, pDLLPath, dllLen, MEM_DECOMMIT);
 		TRACE(_T("CUtility::InjectDllToProc CreateRemoteThread failed\n"));
 		return false;
 	}
 	WaitForSingleObject(tHandle,INFINITE);
+	VirtualFreeEx(targetProc, pDLLPath, dllLen, MEM_DECOMMIT);
 	CloseHandle(tHandle);
 	return true;
 }
