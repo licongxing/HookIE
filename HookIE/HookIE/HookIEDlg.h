@@ -36,4 +36,7 @@ public:
 private:
 	CButton m_uiHookIEBtn;
 	CButton m_uiUnHookIEBtn;
+public:
+	afx_msg void OnBnClickedBtnHookie2();
+	afx_msg void OnBnClickedBtnUnhookie2();
 };

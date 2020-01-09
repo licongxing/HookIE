@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HookIE", "HookIE\HookIE.vcxproj", "{AB96B786-A2F2-4A17-9BF3-5FBA4B80CAA3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InlineHook", "InlineHook\InlineHook.vcxproj", "{6BB94ADC-FB96-423A-B2A6-F0B03EA5DC23}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InlineHookDll", "InlineHook\InlineHook.vcxproj", "{6BB94ADC-FB96-423A-B2A6-F0B03EA5DC23}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HookProcDll", "HookProcDll\HookProcDll.vcxproj", "{578F0BB7-5BC4-46A7-B568-1FA95F7428E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,6 +21,10 @@ Global
 		{6BB94ADC-FB96-423A-B2A6-F0B03EA5DC23}.Debug|Win32.Build.0 = Debug|Win32
 		{6BB94ADC-FB96-423A-B2A6-F0B03EA5DC23}.Release|Win32.ActiveCfg = Release|Win32
 		{6BB94ADC-FB96-423A-B2A6-F0B03EA5DC23}.Release|Win32.Build.0 = Release|Win32
+		{578F0BB7-5BC4-46A7-B568-1FA95F7428E6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{578F0BB7-5BC4-46A7-B568-1FA95F7428E6}.Debug|Win32.Build.0 = Debug|Win32
+		{578F0BB7-5BC4-46A7-B568-1FA95F7428E6}.Release|Win32.ActiveCfg = Release|Win32
+		{578F0BB7-5BC4-46A7-B568-1FA95F7428E6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

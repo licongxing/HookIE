@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6BB94ADC-FB96-423A-B2A6-F0B03EA5DC23}</ProjectGuid>
     <RootNamespace>InlineHook</RootNamespace>
+    <ProjectName>InlineHookDll</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

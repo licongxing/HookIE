@@ -101,6 +101,8 @@
     <None Include="res\HookIE.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\constant.h" />
+    <ClInclude Include="..\include\MsgHook.h" />
     <ClInclude Include="..\include\Utility.h" />
     <ClInclude Include="HookIE.h" />
     <ClInclude Include="HookIEDlg.h" />

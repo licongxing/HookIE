@@ -67,6 +67,8 @@ BEGIN_MESSAGE_MAP(CHookIEDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BTN_HOOKIE, &CHookIEDlg::OnBnClickedBtnHookie)
 	ON_BN_CLICKED(IDC_BTN_UNHOOKIE, &CHookIEDlg::OnBnClickedBtnUnhookie)
+	ON_BN_CLICKED(IDC_BTN_HOOKIE2, &CHookIEDlg::OnBnClickedBtnHookie2)
+	ON_BN_CLICKED(IDC_BTN_UNHOOKIE2, &CHookIEDlg::OnBnClickedBtnUnhookie2)
 END_MESSAGE_MAP()
 
 
@@ -162,7 +164,7 @@ void CHookIEDlg::OnBnClickedBtnHookie()
 	// TODO: 在此添加控件通知处理程序代码
 	CString exePath,dllPath;
 	exePath = CUtility::GetIEPath();
-	dllPath = CUtility::GetModulePath() + _T("InlineHook.dll");
+	dllPath = CUtility::GetModulePath() + _T("InlineHookDll.dll");
 	CUtility::InjectDllToExe(dllPath,exePath);
 }
 
@@ -172,6 +174,60 @@ void CHookIEDlg::OnBnClickedBtnUnhookie()
 	// TODO: 在此添加控件通知处理程序代码
 	CString exePath,dllPath;
 	exePath = CUtility::GetIEPath();
-	dllPath = CUtility::GetModulePath() + _T("InlineHook.dll");
+	dllPath = CUtility::GetModulePath() + _T("InlineHookDll.dll");
 	CUtility::UninstallDllToExe(dllPath,exePath);
+}
+
+static HMODULE g_DllModule = NULL;
+
+typedef void  (*__stdcall MyFunc)(); // 定义函数指针
+
+void CHookIEDlg::OnBnClickedBtnHookie2()
+{
+	if(g_DllModule == NULL)
+	{
+		CString path = CUtility::GetModulePath(NULL);
+		path.Append(_T("HookProcDll.dll"));
+		g_DllModule = LoadLibraryEx(path,NULL,LOAD_WITH_ALTERED_SEARCH_PATH);
+	}
+	if(g_DllModule == NULL)
+	{
+		MessageBox(_T("HookProcDll.dll not found"));
+		return;
+	}
+	MyFunc func = (MyFunc)GetProcAddress(g_DllModule, "SetMsgHookOn");
+	if(func)
+	{
+		func();
+	}
+	else
+	{
+		MessageBox(_T("HookProcDll.dll.SetMsgHookOn not found"));
+	}
+	
+}
+
+
+void CHookIEDlg::OnBnClickedBtnUnhookie2()
+{
+	if(g_DllModule == NULL)
+	{
+		CString path = CUtility::GetModulePath(NULL);
+		path.Append(_T("HookProcDll.dll"));
+		g_DllModule = LoadLibraryEx(path,NULL,LOAD_WITH_ALTERED_SEARCH_PATH);
+	}
+	if(g_DllModule == NULL)
+	{
+		MessageBox(_T("HookProcDll.dll not found"));
+		return;
+	}
+	MyFunc func = (MyFunc)GetProcAddress(g_DllModule, "SetMsgHookOff");
+	if(func)
+	{
+		func();
+	}
+	else
+	{
+		MessageBox(_T("HookProcDll.dll.SetMsgHookOff not found"));
+	}
 }
