@@ -125,13 +125,13 @@ void CUtility::InjectDllToExe(CString strDllPath,CString strExePath)
 	{
 		targetProc = *it;
 		bool ret = InjectDllToProc(strDllPath, targetProc);
-		CloseHandle(targetProc);
 		if(ret == false)
 		{
 			CString temp = _T("CUtility::InjectDllToExe");
-			temp.AppendFormat(_T("handle:%d false\n"),targetProc);
+			temp.AppendFormat(_T("PID:%d false\n"),GetProcessId(targetProc));
 			TRACE(temp);
 		}
+		CloseHandle(targetProc);
 		
 	}
 	return;
@@ -193,6 +193,34 @@ bool CUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 	return true;
 }
 
+bool CUtility::InjectDllToProc(CString strDllPath, DWORD PID)
+{
+	bool bResult = false;
+	HANDLE procHandle=OpenProcess(PROCESS_ALL_ACCESS,FALSE,PID);  
+	if(procHandle)
+	{
+		bool ret = InjectDllToProc(strDllPath,procHandle);
+		bResult = ret;
+		if(ret == false)
+		{
+			CString temp = _T("CUtility::InjectDllToProc");
+			temp.AppendFormat(_T("PID:%d false\n"),PID);
+			TRACE(temp);
+		}
+		CloseHandle(procHandle);
+		
+	}
+	else
+	{
+		CString temp;
+		DWORD errCode = GetLastError();
+		CString errMsg = CUtility::GetErrorMsg(errCode);
+		temp.Format(_T("OpenProcess false,PID:%d,errCode:%d,errMsg:%s"),PID,errCode,errMsg);
+		TRACE(temp);
+	}
+	return bResult;
+}
+
 void CUtility::UninstallDllToExe(CString strDllPath,CString strExePath)
 {
 	std::list<HANDLE> handleList;
@@ -204,13 +232,13 @@ void CUtility::UninstallDllToExe(CString strDllPath,CString strExePath)
 	{
 		targetProc = *it;
 		bool ret = UninstallDllToProc(strDllPath, targetProc);
-		CloseHandle(targetProc);
 		if(ret == false)
 		{
 			CString temp = _T("CUtility::UninstallDllToExe");
-			temp.Format(_T("handle:%d false\n"),targetProc);
+			temp.Format(_T("PID:%d false\n"),GetProcessId(targetProc));
 			TRACE(temp);
 		}
+		CloseHandle(targetProc);
 		
 	}
 	return;
@@ -277,6 +305,34 @@ bool CUtility::UninstallDllToProc(CString strDllPath, HANDLE targetProc)
 	return true;
 }
 
+bool CUtility::UninstallDllToProc(CString strDllPath, DWORD PID)
+{
+	bool bResult = false;
+	HANDLE procHandle=OpenProcess(PROCESS_ALL_ACCESS,FALSE,PID);  
+	if(procHandle)
+	{
+		bool ret = UninstallDllToProc(strDllPath,procHandle);
+		bResult = ret;
+		if(ret == false)
+		{
+			CString temp = _T("CUtility::UninstallDllToProc");
+			temp.AppendFormat(_T("PID:%d false\n"),PID);
+			TRACE(temp);
+		}
+		CloseHandle(procHandle);
+
+	}
+	else
+	{
+		CString temp;
+		DWORD errCode = GetLastError();
+		CString errMsg = CUtility::GetErrorMsg(errCode);
+		temp.Format(_T("CUtility::UninstallDllToProc,OpenProcess false,PID:%d,errCode:%d,errMsg:%s"),PID,errCode,errMsg);
+		TRACE(temp);
+	}
+	return bResult;
+}
+
 CStringW CUtility::A2Wstring(std::string strA)
 
 {
@@ -334,4 +390,15 @@ CString CUtility::GetErrorMsg(DWORD errorCode)
 		LocalFree(lpDisplayBuf);     
 		return result;
 	}
+}
+
+CString CUtility::GetCurExeName()
+{
+	HMODULE hModule = GetModuleHandle(NULL);
+	TCHAR exePath[MAX_PATH] = {0};
+	GetModuleFileName(hModule,exePath,MAX_PATH);
+	CString strPath = exePath;
+	int lastFlag = strPath.ReverseFind('\\');
+	CString exeName = strPath.Right(strPath.GetLength() - lastFlag - 1);
+	return exeName;
 }

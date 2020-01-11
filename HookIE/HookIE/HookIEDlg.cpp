@@ -13,7 +13,6 @@
 
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
-
 class CAboutDlg : public CDialogEx
 {
 public:
@@ -104,7 +103,12 @@ BOOL CHookIEDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-
+	// 允许其他进程给本程序发送消息
+	ChangeWindowMessageFilterEx(m_hWnd, WM_IE_OPEN, MSGFLT_ALLOW, NULL);
+	//ChangeWindowMessageFilter (WM_DROPFILES, MSGFLT_ADD);
+	//ChangeWindowMessageFilter (WM_COPYDATA, MSGFLT_ADD);
+	//ChangeWindowMessageFilter (WM_IE_OPEN, MSGFLT_ADD);
+	//ChangeWindowMessageFilterEx(AfxGetMainWnd()->m_hWnd, WM_IE_OPEN, MSGFLT_ALLOW, NULL);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -230,4 +234,30 @@ void CHookIEDlg::OnBnClickedBtnUnhookie2()
 	{
 		MessageBox(_T("HookProcDll.dll.SetMsgHookOff not found"));
 	}
+}
+
+
+LRESULT CHookIEDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	if(message == WM_IE_OPEN)
+	{
+		
+		BOOL bAtaach = (BOOL)wParam;
+		DWORD dwPID = (DWORD)lParam;
+		CString dllPath =CUtility::GetModulePath() + _T("InlineHookDll.dll");
+		//CString temp;
+		//temp.Format(_T("%s,WM_IE_OPEN Attach=%d,PID=%d"),dllPath,bAtaach,dwPID);
+		//MessageBox(temp);
+		if(bAtaach)
+		{
+			// 有IE浏览器被打开
+			CUtility::InjectDllToProc(dllPath,dwPID);
+		}
+		else
+		{
+			CUtility::UninstallDllToProc(dllPath,dwPID);
+		}
+	}
+
+	return CDialogEx::DefWindowProc(message, wParam, lParam);
 }

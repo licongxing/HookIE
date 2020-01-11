@@ -31,12 +31,17 @@ public:
 	// 指定DLL注入到指定进程句柄
 	static bool InjectDllToProc(CString strDllPath, HANDLE targetProc);
 
+	// 指定DLL注入到指定进程句柄(根据进程PID)
+	static bool InjectDllToProc(CString strDllPath, DWORD PID);
+
 	// 指定DLL从指定EXE进程卸载
 	static void UninstallDllToExe(CString strDllPath,CString strExePath);
 
 	// 指定DLL从指定进程句柄卸载
 	static bool  UninstallDllToProc(CString strDllPath, HANDLE targetProc);
 
+	// 指定DLL从指定进程句柄卸载(根据进程PID)
+	static bool  UninstallDllToProc(CString strDllPath, DWORD PID);
 
 
 	static CStringW CUtility::A2Wstring(std::string strA);
@@ -44,5 +49,7 @@ public:
 	static std::string CUtility::W2Astring(const CString& strUnicode);
 
 	static CString GetErrorMsg(DWORD errorCode);
+
+	static CString GetCurExeName();
 };
 

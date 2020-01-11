@@ -65,6 +65,23 @@ end:
 
 VOID InlineHookIE()
 {
+	// ≤‚ ‘œ˚œ¢∑¢ÀÕ
+	//HWND targetWnd = FindWindow(_T("#32770"),_T("HookIE"));
+	//if(targetWnd)
+	//{
+
+	//	BOOL ret = PostMessage(targetWnd,WM_USER + 99,TRUE,NULL);
+	//	if(ret == FALSE)
+	//	{
+	//		DWORD errCode = GetLastError();
+	//		CString errMsg = CUtility::GetErrorMsg(errCode);
+	//		CString temp;
+	//		temp.Format(_T("PostMessage failed!!!errCode:%d,errMsg:%s"),errCode,errMsg);
+	//		OutputDebugString(temp);
+	//	}
+	//}
+	
+
 	OutputDebugString(_T("InlineHookIE into"));
 	g_inlineHookObj7.Hook("WININET.dll","InternetConnectW",(FARPROC)MyInternetConnectW);
 	return;

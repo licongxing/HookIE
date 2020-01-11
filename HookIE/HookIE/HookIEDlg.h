@@ -39,4 +39,5 @@ private:
 public:
 	afx_msg void OnBnClickedBtnHookie2();
 	afx_msg void OnBnClickedBtnUnhookie2();
+	virtual LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 };
