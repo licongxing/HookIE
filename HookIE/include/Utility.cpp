@@ -125,12 +125,17 @@ void CUtility::InjectDllToExe(CString strDllPath,CString strExePath)
 	{
 		targetProc = *it;
 		bool ret = InjectDllToProc(strDllPath, targetProc);
-		if(ret == false)
+		//if(ret == false)
 		{
 			CString temp = _T("CUtility::InjectDllToExe");
-			temp.AppendFormat(_T("PID:%d false\n"),GetProcessId(targetProc));
+			if(ret == false)
+				temp.AppendFormat(_T(" PID:%d false\n"),GetProcessId(targetProc));
+			else
+				temp.AppendFormat(_T(" PID:%d true\n"),GetProcessId(targetProc));
+
 			TRACE(temp);
 		}
+		
 		CloseHandle(targetProc);
 		
 	}
@@ -141,6 +146,7 @@ bool CUtility::InjectDllToProc(CString strDllPath, HANDLE targetProc)
 {
 	if(targetProc == NULL)
 	{
+		TRACE(_T("CUtility::InjectDllToProc targetProc is NULL\n"));
 		return false;
 	}
 	/*
@@ -204,7 +210,7 @@ bool CUtility::InjectDllToProc(CString strDllPath, DWORD PID)
 		if(ret == false)
 		{
 			CString temp = _T("CUtility::InjectDllToProc");
-			temp.AppendFormat(_T("PID:%d false\n"),PID);
+			temp.AppendFormat(_T(" PID:%d false\n"),PID);
 			TRACE(temp);
 		}
 		CloseHandle(procHandle);
@@ -235,7 +241,7 @@ void CUtility::UninstallDllToExe(CString strDllPath,CString strExePath)
 		if(ret == false)
 		{
 			CString temp = _T("CUtility::UninstallDllToExe");
-			temp.Format(_T("PID:%d false\n"),GetProcessId(targetProc));
+			temp.AppendFormat(_T(" PID:%d false\n"),GetProcessId(targetProc));
 			TRACE(temp);
 		}
 		CloseHandle(targetProc);
@@ -316,7 +322,7 @@ bool CUtility::UninstallDllToProc(CString strDllPath, DWORD PID)
 		if(ret == false)
 		{
 			CString temp = _T("CUtility::UninstallDllToProc");
-			temp.AppendFormat(_T("PID:%d false\n"),PID);
+			temp.AppendFormat(_T(" PID:%d false\n"),PID);
 			TRACE(temp);
 		}
 		CloseHandle(procHandle);

@@ -184,7 +184,7 @@ void CHookIEDlg::OnBnClickedBtnUnhookie()
 
 static HMODULE g_DllModule = NULL;
 
-typedef void  (*__stdcall MyFunc)(); // 定义函数指针
+typedef void  (* MyFunc)(); // 定义函数指针
 
 void CHookIEDlg::OnBnClickedBtnHookie2()
 {
