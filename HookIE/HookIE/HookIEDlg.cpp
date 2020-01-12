@@ -104,10 +104,10 @@ BOOL CHookIEDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 	// 允许其他进程给本程序发送消息
-	ChangeWindowMessageFilterEx(m_hWnd, WM_IE_OPEN, MSGFLT_ALLOW, NULL);
+	//ChangeWindowMessageFilterEx(m_hWnd, WM_IE_OPEN, MSGFLT_ALLOW, NULL); //支持win7以上
 	//ChangeWindowMessageFilter (WM_DROPFILES, MSGFLT_ADD);
 	//ChangeWindowMessageFilter (WM_COPYDATA, MSGFLT_ADD);
-	//ChangeWindowMessageFilter (WM_IE_OPEN, MSGFLT_ADD);
+	//ChangeWindowMessageFilter (WM_IE_OPEN, MSGFLT_ADD); // 兼容xp
 	//ChangeWindowMessageFilterEx(AfxGetMainWnd()->m_hWnd, WM_IE_OPEN, MSGFLT_ALLOW, NULL);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
